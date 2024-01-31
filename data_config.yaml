@@ -1,0 +1,4 @@
+# name of the primary dataset folder (not absolute/relative location)
+primary: primary
+# names of the secondary datasets
+secondary: [secondary-1, secondary-2]

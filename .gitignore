@@ -1,0 +1,15 @@
+# image files
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.mat
+**/*.bmp
+**/*.JPG
+**/*.JPEG
+
+
+# idist numpy objects
+**/*.npy
+
+# cache
+**/__pycache__/
