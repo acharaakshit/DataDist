@@ -9,7 +9,7 @@ import models
 import utils
 import pandas as pd
 
-def save_outputs(folder, feature_extractor, checkpoint):
+def save_outputs(folder, feature_extractor, checkpoint, size):
     images = []
     for filename in os.listdir(folder):
         images.append(os.path.join(folder, filename))
@@ -24,8 +24,8 @@ def save_outputs(folder, feature_extractor, checkpoint):
     for image_path in tqdm(images):
         img = Image.open(image_path).convert(mode="RGB")
         img_names.append(image_path)
-        img.thumbnail((32, 32), Image.LANCZOS)
-        img.resize((32, 32), Image.LANCZOS)
+        img.thumbnail(size, Image.LANCZOS)
+        img.resize(size, Image.LANCZOS)
         img = np.array(img.convert('RGB'))
 
         if feature_extractor == "EfficientNet":
@@ -69,12 +69,16 @@ def main():
         print(s)
         secondary_paths.append(os.path.join(prefix, s))
     
-    primary_outputs, primary_names = save_outputs(folder=primary_path, feature_extractor=args.model, checkpoint=checkpoints[args.model])
+    # image size
+    h = categories['height']
+    w = categories['width']
+    
+    primary_outputs, primary_names = save_outputs(folder=primary_path, feature_extractor=args.model, checkpoint=checkpoints[args.model], size=(h,w))
 
     df_lists = []
 
     for secondary_path, secondary_dataset in zip(secondary_paths, categories['secondary']):
-        secondary_outputs, secondary_names = save_outputs(folder=secondary_path, feature_extractor=args.model, checkpoint=checkpoints[args.model])
+        secondary_outputs, secondary_names = save_outputs(folder=secondary_path, feature_extractor=args.model, checkpoint=checkpoints[args.model], size=(h,w))
         scores = utils.reduce_dimensions(outputs=primary_outputs+secondary_outputs,
                                         names=(primary_names,secondary_names),
                                         n_components=n_components,

@@ -2,3 +2,5 @@
 primary: primary
 # names of the secondary datasets
 secondary: [secondary-1, secondary-2]
+width: 32
+height: 32
