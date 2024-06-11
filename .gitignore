@@ -13,3 +13,8 @@
 
 # cache
 **/__pycache__/
+
+# model files
+**/*.bin
+**/*.safetensors
+**/*.json
