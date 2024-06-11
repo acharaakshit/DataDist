@@ -16,5 +16,7 @@
 
 # model files
 **/*.bin
+**/*.pt
+**/*.pth
 **/*.safetensors
 **/*.json
