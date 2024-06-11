@@ -1,1 +1,1 @@
-python3 -u compute_distance.py
+python3 -u compute_distance.py --model DinoV2
