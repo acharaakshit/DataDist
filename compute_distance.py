@@ -1,4 +1,3 @@
-from sys import prefix
 from PIL import Image
 import argparse
 import numpy as np
@@ -20,6 +19,10 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
         model = models.EfficientNetB3FeatureExtractor()
     elif feature_extractor == "DinoV2":
         model = models.DinoV2FeatureExtractor(modelpath=checkpoint)
+    elif feature_extractor == "CLIPSegForImageSegmentation":
+        model = models.CLIPSegForImageSegmentationFeatureExtractor(modelpath=checkpoint)
+    elif feature_extractor == "SAM":
+        model = models.SAMFeatureExtractor(modelpath=checkpoint)
     
     # add your custom model here
     
@@ -35,6 +38,11 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
             output = model.extract_features(np.array([img]))
         elif feature_extractor == "DinoV2":
             output = model.extract_features(np.array([img]))
+        elif feature_extractor == "CLIPSegForImageSegmentation":
+            prompt = ["line structures"]
+            output = model.extract_features(img, prompt=prompt)
+        elif feature_extractor == "SAM":
+            output = model.extract_features(img_array=img)
         # add custom prediction function suitable for your model
         
         try:
