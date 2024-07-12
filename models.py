@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.applications.efficientnet import EfficientNetB3
-from transformers import AutoImageProcessor, Dinov2Model, CLIPSegProcessor, CLIPSegForImageSegmentation
+from transformers import AutoImageProcessor, Dinov2Model, CLIPSegProcessor, CLIPSegForImageSegmentation, CLIPSegModel
 import torch
 from segment_anything import sam_model_registry, SamPredictor
 
@@ -34,6 +34,16 @@ class CLIPSegForImageSegmentationFeatureExtractor:
         with torch.no_grad():
             outputs = self.model(**inputs, output_hidden_states=True)
         output = torch.stack(outputs.decoder_output.hidden_states)
+        return output
+
+class CLIPSegModelFeatureExtractor:
+    def __init__(self, modelpath):
+        self.image_processor = CLIPSegProcessor.from_pretrained(modelpath, local_files_only=True)
+        self.model = CLIPSegModel.from_pretrained(modelpath, local_files_only=True)
+
+    def extract_features(self, img_array):
+        inputs = self.image_processor(images=img_array, return_tensors="pt")
+        output = self.model.get_image_features(**inputs)
         return output
 
 class SAMFeatureExtractor:
