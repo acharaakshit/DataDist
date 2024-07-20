@@ -7,6 +7,8 @@ from tqdm import tqdm
 import models
 import utils
 import pandas as pd
+import torch
+from torchvision.models.feature_extraction import create_feature_extractor
 
 def save_outputs(folder, feature_extractor, checkpoint, size):
     images = []
@@ -25,6 +27,16 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
         model = models.CLIPSegModelFeatureExtractor(modelpath=checkpoint)
     elif feature_extractor == "SAM":
         model = models.SAMFeatureExtractor(modelpath=checkpoint)
+    elif feature_extractor == "Unet++":
+        model = models.UnetPPModel("unetplusplus", "efficientnet-b3", in_channels=3, out_classes=1)
+        checkpoint = torch.load(checkpoint, map_location=torch.device('cpu'))
+        model.load_state_dict(checkpoint["state_dict"])
+        model.eval()
+    elif feature_extractor == "DeepCrack":
+        model = models.DeepCrack()
+        trainer = models.DeepCrackTrainer(model)
+        model.load_state_dict(trainer.saver.load(checkpoint))
+
     
     # add your custom model here
     
@@ -47,6 +59,20 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
             output = model.extract_features(img)
         elif feature_extractor == "SAM":
             output = model.extract_features(img_array=img)
+        elif feature_extractor == "Unet++":
+            img = np.expand_dims(np.transpose(img, (2,1,0)), axis=0)
+            img = torch.from_numpy(img)
+            output = model.model.encoder(img.float())
+            output = torch.cat([tensor.reshape(-1) for tensor in output])
+        elif feature_extractor == "DeepCrack":
+            img = np.array([np.array(img).transpose(2,0,1).astype(np.float32) / 255])
+            return_nodes = {}
+            for layer in range(1,6):
+                return_nodes[f"down{layer}"] = f"encoder{layer}"
+            deepcrack_model = create_feature_extractor(model, return_nodes=return_nodes)
+            img = torch.from_numpy(img).float()
+            features = list(deepcrack_model(img).values())
+            output = torch.cat([tensor.reshape(-1) for tensor in features])
         # add custom prediction function suitable for your model
         
         try:
