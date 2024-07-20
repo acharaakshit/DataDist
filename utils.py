@@ -3,12 +3,6 @@ import matplotlib.pyplot as plt
 import scipy
 from sklearn.decomposition import PCA
 
-def compute_pairwise():
-    pass
-
-def plot_multiple_dimensions():
-    pass
-
 def reduce_dimensions(outputs, names, n_components, feature_extractor, dataset_name):
     # reduce dimensions of the outputs
     transformer = PCA(n_components=n_components)
