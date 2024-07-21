@@ -9,6 +9,7 @@ import utils
 import pandas as pd
 import torch
 from torchvision.models.feature_extraction import create_feature_extractor
+import adsam_models
 
 def save_outputs(folder, feature_extractor, checkpoint, size):
     images = []
@@ -36,8 +37,17 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
         model = models.DeepCrack()
         trainer = models.DeepCrackTrainer(model)
         model.load_state_dict(trainer.saver.load(checkpoint))
-
-    
+    elif feature_extractor == "SAMAdapter":
+        with torch.no_grad():
+            config = './config-sam-adapter.yaml'
+            with open(config, 'r') as f:
+                config = yaml.load(f, Loader=yaml.FullLoader)
+            model = adsam_models.make(config['model'])
+            sam_checkpoint = torch.load(checkpoint, map_location='cpu')
+            model.load_state_dict(sam_checkpoint, strict=True)
+        # change input image size to required size of 1024*1024
+        size = (1024, 1024)
+        print(f"Image shape changed to {size}")
     # add your custom model here
     
     img_names = []
@@ -45,7 +55,7 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
         img = Image.open(image_path).convert(mode="RGB")
         img_names.append(image_path)
         img.thumbnail(size, Image.LANCZOS)
-        img.resize(size, Image.LANCZOS)
+        img = img.resize(size, Image.LANCZOS)
         img = np.array(img.convert('RGB'))
 
         if feature_extractor == "EfficientNet":
@@ -73,6 +83,10 @@ def save_outputs(folder, feature_extractor, checkpoint, size):
             img = torch.from_numpy(img).float()
             features = list(deepcrack_model(img).values())
             output = torch.cat([tensor.reshape(-1) for tensor in features])
+        elif feature_extractor == "SAMAdapter":
+            img = np.array([np.array(img).transpose(2,0,1).astype(np.float32)/255])
+            img = torch.from_numpy(img)
+            output = model.image_encoder(img.float())
         # add custom prediction function suitable for your model
         
         try:

@@ -5,3 +5,4 @@ CLIPSegModel: ./clipseg-rd64-refined
 SAM: ./sam_vit_b_01ec64.pth
 Unet++: ./unetpp_base.ckpt
 DeepCrack: ./deepcrack_base.pth
+SAMAdapter: ./adsam_base/_cod-sam-vit-b/adsam.pth

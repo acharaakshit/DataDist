@@ -8,10 +8,14 @@ This repository contains the code to compute the dataset-dataset and image-datas
 - Put your primary and secondary dataset folders in `./data`.
 - Edit the `data_config.yaml` with the names of primary and secondary dataset folders.
 - Run the `compute_distance.sh` script to obtain the distances computed using a pretrained EfficientNet model.
+- `adsam_models` contains the scripts borrowed from [SAM-Adapter-PyTorch](https://github.com/tianrun-chen/SAM-Adapter-PyTorch/tree/main)
+- NOTE: For ADSAM models, you would need to install `mmcv` using `pip install mmcv==1.7.0`.
+#### Model Checkpoints
+- The model checkpoints for Unet++, DeepCrack and ADSAM are provided [here](https://drive.google.com/drive/folders/1O3905yPoRK71v3jtULG_uRde3FYfsT0M?usp=sharing).
 #### Custom Model
 The distance computation can be performed using other models using the following steps:
 - Add the model class in the `models.py`.
-- Provide the model name and associated checjpoint in the  `model_config.yaml`.
+- Provide the model name and associated checkpoint in the  `model_config.yaml`.
 - Update the `save_outputs` method in `compute_distance.py` to process input images and parse the model outputs.
 - Run `compute_distance.sh` with the custom model name as argument.
 
